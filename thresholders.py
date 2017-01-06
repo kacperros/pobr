@@ -13,6 +13,7 @@ def threshold_hues(hsv_image, bounds):
                     break
             if not passed:
                 hsv_image[i, j, 2] = 0
+    return hsv_image
 
 
 def threshold_values(hsv_image, bounds):
@@ -26,6 +27,7 @@ def threshold_values(hsv_image, bounds):
                     break
             if not passed:
                 hsv_image[i, j, 2] = 0
+    return hsv_image
 
 
 def threshold_saturations(hsv_image, bounds):
@@ -39,3 +41,4 @@ def threshold_saturations(hsv_image, bounds):
                     break
             if not passed:
                 hsv_image[i, j, 2] = 0
+    return hsv_image

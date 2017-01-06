@@ -4,9 +4,11 @@ import cv2
 
 def bgr2hsv(image):
     rows, cols, channels = image.shape
+    image = image.astype(float)
     for i in range(0, rows):
         for j in range(0, cols):
             image[i, j] = _convert_pixel_bgr2hsv(image[i, j])
+    return image
 
 
 def _convert_pixel_bgr2hsv(pixel):
@@ -36,6 +38,8 @@ def hsv2bgr(hsv_image):
     for i in range(0, rows):
         for j in range(0, cols):
             hsv_image[i, j] = _convert_pixel_hsv2bgr(hsv_image[i, j])
+    hsv_image = hsv_image.astype(int)
+    return hsv_image
 
 
 def _convert_pixel_hsv2bgr(hsv_pix):
@@ -55,3 +59,15 @@ def _convert_pixel_hsv2bgr(hsv_pix):
     else:
         rgb = [c, 0, x]
     return [round((rgb[2] + m) * 255, 0), round((rgb[1] + m) * 255, 0), round((rgb[0] + m) * 255, 0)]
+
+
+def bgr2gray(image):
+    rows, cols, channels = image.shape
+    for i in range(0, rows):
+        for j in range(0, cols):
+            image[i, j] = [
+                (image[i, j, 0] + image[i, j, 1] + image[i, j, 2]) / 3,
+                (image[i, j, 0] + image[i, j, 1] + image[i, j, 2]) / 3,
+                (image[i, j, 0] + image[i, j, 1] + image[i, j, 2]) / 3
+            ]
+    return image
