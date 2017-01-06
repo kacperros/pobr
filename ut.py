@@ -1,5 +1,6 @@
 import unittest
 import colorspace_converters as cs_conv
+import Box
 import thresholders as ths
 import cv2
 
@@ -21,11 +22,16 @@ class BiedronkaUnitTests(unittest.TestCase):
 
     def test_thresholder_hue(self):
         img = cv2.imread("images/four_pix.png")
-        cs_conv.bgr2hsv(img)
-        ths.threshold_hues(img, [[0, 20], [340, 360]])
-        cs_conv.hsv2bgr(img)
+        img = cs_conv.bgr2hsv(img)
+        img = ths.threshold_hues(img, [[0, 20], [340, 360]])
+        img = cs_conv.hsv2bgr(img)
         self.assertListEqual(list(img[0, 0]), [0, 0, 0])
         self.assertListEqual(list(img[0, 1]), [0, 0, 0])
         self.assertListEqual(list(img[1, 0]), [0, 0, 255])
         self.assertListEqual(list(img[1, 1]), [255, 255, 255])
+
+    def test_text_boxing(self):
+        img = cv2.imread("images/boxing_text_img.png")
+        boxes = Box.box_2color_image(img)
+        self.assertEqual(len(boxes), 1)
         print("Done")
