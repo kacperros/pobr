@@ -35,3 +35,9 @@ class BiedronkaUnitTests(unittest.TestCase):
         boxes = Box.box_2color_image(img)
         self.assertEqual(len(boxes), 1)
         print("Done")
+
+    def test_invert(self):
+        img = cv2.imread("images/four_pix.png")
+        img = cs_conv.invert(img)
+        self.assertListEqual(list(img[1, 1]), [0, 0, 0, ])
+        print("Done")

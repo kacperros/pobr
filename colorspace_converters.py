@@ -71,3 +71,7 @@ def bgr2gray(image):
                 (image[i, j, 0] + image[i, j, 1] + image[i, j, 2]) / 3
             ]
     return image
+
+
+def invert(image):
+    return 255 - image
