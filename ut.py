@@ -39,5 +39,5 @@ class BiedronkaUnitTests(unittest.TestCase):
     def test_invert(self):
         img = cv2.imread("images/four_pix.png")
         img = cs_conv.invert(img)
-        self.assertListEqual(list(img[1, 1]), [0, 0, 0, ])
+        self.assertListEqual(list(img[1, 1]), [0, 0, 0])
         print("Done")

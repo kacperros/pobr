@@ -3,7 +3,8 @@ import sys
 
 
 class Box:
-    def __init__(self):
+    def __init__(self, box_color):
+        self.box_color = box_color
         self.row_min = sys.maxsize
         self.row_max = -1
         self.col_min = sys.maxsize
@@ -20,7 +21,7 @@ class Box:
             self.col_min = col
 
 
-def box_2color_image(image):
+def box_2color_image(image, box_color):
     rows, cols, channels = image.shape
     conditions = np.full((rows, cols), False)
     boxes = []
@@ -28,7 +29,7 @@ def box_2color_image(image):
         for j in range(1, cols - 1):
             if np.array_equal(image[i, j], [0, 0, 0]) or conditions[i, j]:
                 continue
-            box = Box()
+            box = Box(box_color)
             conditions = new_box(box, image, conditions, (i, j))
             boxes.append(box)
     return boxes

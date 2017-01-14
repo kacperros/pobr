@@ -66,9 +66,9 @@ def bgr2gray(image):
     for i in range(0, rows):
         for j in range(0, cols):
             image[i, j] = [
-                (image[i, j, 0] + image[i, j, 1] + image[i, j, 2]) / 3,
-                (image[i, j, 0] + image[i, j, 1] + image[i, j, 2]) / 3,
-                (image[i, j, 0] + image[i, j, 1] + image[i, j, 2]) / 3
+                (int(image[i, j, 0]) + int(image[i, j, 1]) + int(image[i, j, 2])) / 3,
+                (int(image[i, j, 0]) + int(image[i, j, 1]) + int(image[i, j, 2])) / 3,
+                (int(image[i, j, 0]) + int(image[i, j, 1]) + int(image[i, j, 2])) / 3
             ]
     return image
 
