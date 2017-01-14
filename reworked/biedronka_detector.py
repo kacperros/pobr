@@ -1,0 +1,36 @@
+import colorspace_converters as cs_conv
+from reworked.threshold import HSVThresholder, PixelHThreshold, PixelVThreshold, PixelSThreshold
+from reworked.BoundingBoxesBuilder import BoundingBoxesBuilder
+import cv2
+import copy
+import numpy as np
+
+
+class BiedronkaDetector:
+    def __init__(self, bgr_image):
+        self.bgr_image = bgr_image
+        print('Assigned Original')
+        self.hsv_image = cs_conv.bgr2hsv(copy.copy(bgr_image))
+        print('Assigned HSV')
+        self.gray_image = cs_conv.bgr2gray(copy.copy(bgr_image))
+        print('Assigned Gray')
+        self.hsv_inverted = cs_conv.bgr2hsv(cs_conv.invert(copy.copy(bgr_image)))
+        print('Assigned Inverted HSV')
+        self.thresholder = HSVThresholder(copy.copy(self.hsv_image))
+        print('Created Thresholder')
+        self.bounding_boxes_builder = BoundingBoxesBuilder(bgr_image.shape[0], bgr_image.shape[1])
+        print('Created BBB')
+
+    def detect(self):
+        r_bottom_image = self.thresholder.threshold(
+            [PixelHThreshold(0, 10), PixelVThreshold(0.5, 1.0), PixelSThreshold(0.3, 1.0)])
+        print('Red bottom thresh done')
+        r_top_image = self.thresholder.threshold(
+            [PixelHThreshold(350, 360), PixelVThreshold(0.5, 1.0), PixelSThreshold(0.3, 1.0)])
+        print('Red top thresh done')
+        w_image = self.thresholder.threshold([PixelVThreshold(0.75, 1), PixelSThreshold(0, 0.2)])
+        print('White thresh done')
+        rev_b_image = self.thresholder.threshold([PixelVThreshold(0.65, 1), PixelSThreshold(0, 0.2)], self.hsv_inverted)
+        print('Black thresh done')
+        return r_bottom_image, r_top_image, w_image, rev_b_image
+
