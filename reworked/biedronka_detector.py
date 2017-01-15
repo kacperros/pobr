@@ -1,3 +1,4 @@
+import Box
 import colorspace_converters as cs_conv
 from reworked.threshold import HSVThresholder, PixelHThreshold, PixelVThreshold, PixelSThreshold
 from reworked.Colors import BColors
@@ -26,6 +27,7 @@ class BiedronkaDetector:
     def detect(self):
         self.__threshold_image()
         boxes = self.bounding_boxes_builder.build()
+        return Box.draw_boxes(self.bgr_image, boxes)
 
     def __threshold_image(self):
         r_bottom_image = self.thresholder.threshold(
@@ -42,5 +44,4 @@ class BiedronkaDetector:
         rev_b_image = self.thresholder.threshold([PixelVThreshold(0.65, 1), PixelSThreshold(0, 0.2)], self.hsv_inverted)
         self.bounding_boxes_builder.append(rev_b_image, BColors.BLACK)
         print('Black thresh done')
-        return r_bottom_image, r_top_image, rev_b_image, w_image
 
