@@ -1,5 +1,6 @@
 import Box
 import colorspace_converters as cs_conv
+from reworked.BoxesFilter import BoxesFilter
 from reworked.threshold import HSVThresholder, PixelHThreshold, PixelVThreshold, PixelSThreshold
 from reworked.Colors import BColors
 from reworked.BoundingBoxesBuilder import BoundingBoxesBuilder
@@ -22,12 +23,15 @@ class BiedronkaDetector:
         print('Created Thresholder')
         self.bounding_boxes_builder = BoundingBoxesBuilder()
         self.bounding_boxes_builder.builder(bgr_image.shape[0], bgr_image.shape[1])
+        self.boxes_filter = BoxesFilter()
         print('Created BBB')
 
     def detect(self):
         self.__threshold_image()
         boxes = self.bounding_boxes_builder.build()
-        return Box.draw_boxes(self.bgr_image, boxes)
+        self.boxes_filter.input(boxes)
+        boxes = self.boxes_filter.filter()
+        return boxes
 
     def __threshold_image(self):
         r_bottom_image = self.thresholder.threshold(
