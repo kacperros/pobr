@@ -55,7 +55,7 @@ class BoundingBoxesBuilder:
         if not self.image_colors_view[row, col] == box.box_color:
             self.used[row, col] = -1
             return False
-        box.add_point(row, col)
+        box.add_point(row, col, self.__is_border_point(row, col, box.box_color))
         self.used[row, col] = 1
         return True
 
@@ -69,3 +69,12 @@ class BoundingBoxesBuilder:
                 self.used[neighbor] = 0
                 certain_neighbors.append(neighbor)
         return certain_neighbors
+
+    def __is_border_point(self, row, col, color):
+        if row == self.rows - 1 or col == self.cols - 1 or row == 0 or col == 0:
+            return False
+        neighbors = [(i, j) for i in range(row - 1, row + 2) for j in range(col - 1, col + 2)]
+        for neighbor in neighbors:
+            if color != self.image_colors_view[neighbor]:
+                return True
+        return False

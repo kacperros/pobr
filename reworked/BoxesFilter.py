@@ -9,14 +9,14 @@ class BoxesFilter:
         self.clusters = []
 
     def input(self, boxes_to_filter):
-        boxes_to_filter = [b for b in boxes_to_filter if b.col_max - b.col_min < 30 or b.row_max - b.row_min < 30]
         for box in boxes_to_filter:
             self.boxes[box.box_color].append(box)
 
     def filter(self):
         self.__filter_out_bad_boxes()
         self.__remove_unpaired_black_reds()
-        self.__remove_far_whites()
+        #TODO: pair whites-blacks to remove bad whites
+        self.__remove_far_small_whites()
         return self.clusters
 
     def __filter_out_bad_boxes(self):
@@ -39,15 +39,18 @@ class BoxesFilter:
             if blacks:
                 self.clusters.append((red, blacks, []))
 
-    def __remove_far_whites(self):
+    def __remove_far_small_whites(self):
         for cluster in self.clusters:
             closest_white = None
             closest_distance = sys.maxsize
             for white in self.boxes[BColors.WHITE.value[0]]:
-                if closest_distance > cluster[0].distance(white) and not cluster[0].contains(white):
-                    closest_white = white
-                    closest_distance = cluster[0].distance(white)
-            cluster[2].append(closest_white)
+                if not cluster[0].contains(white) and white.get_height() > 5 and \
+                                        0.1 <= white.get_height()/cluster[0].get_height() <= 0.5:
+                    if closest_distance > cluster[0].distance(white):
+                        closest_white = white
+                        closest_distance = cluster[0].distance(white)
+            if closest_white is not None:
+                cluster[2].append(closest_white)
 
     def __get_remaining_boxes(self):
         boxes = []
