@@ -1,4 +1,5 @@
 from reworked.Box import Box
+import numpy as np
 from reworked.Colors import BColors
 import sys
 
@@ -15,17 +16,23 @@ class BoxesFilter:
     def filter(self):
         self.__filter_out_bad_boxes()
         self.__remove_unpaired_black_reds()
-        #TODO: pair whites-blacks to remove bad whites
-        self.__remove_far_small_whites()
+        self.__remove_bad_whites()
+        self.__cluster_in_whites()
         return self.clusters
 
     def __filter_out_bad_boxes(self):
         for k, v in self.boxes.items():
+            items = []
             for box in v:
                 if box.col_min < 0 or box.row_min < 0:
-                    del box
+                    continue
                 if box.col_max > 100000 or box.row_max > 100000:
-                    del box
+                    continue
+                if box.get_height() < 5 or box.get_width() < 5:
+                    continue
+                items.append(box)
+            v = items
+            self.boxes[k] = v
 
     def __remove_unpaired_black_reds(self):
         self.__group_black_red()
@@ -39,13 +46,27 @@ class BoxesFilter:
             if blacks:
                 self.clusters.append((red, blacks, []))
 
-    def __remove_far_small_whites(self):
+    def __remove_bad_whites(self):
+        whites = self.boxes[BColors.WHITE.value[0]]
+        good_whites = []
+        for white in whites:
+            if white.get_height() < 5 or white.get_width() < 5:
+                continue
+            if not 0.7 <= white.get_height()/white.get_width() <= 1.4:
+                continue
+            if not 0.5 <= len(white.pixel_coords) / (white.get_height() * white.get_width()) <= 0.8:
+                continue
+            if not 50 <= white.border_length**2/len(white.pixel_coords) <= 150:
+                continue
+            good_whites.append(white)
+        self.boxes[BColors.WHITE.value[0]] = good_whites
+
+    def __cluster_in_whites(self):
         for cluster in self.clusters:
             closest_white = None
             closest_distance = sys.maxsize
             for white in self.boxes[BColors.WHITE.value[0]]:
-                if not cluster[0].contains(white) and white.get_height() > 5 and \
-                                        0.1 <= white.get_height()/cluster[0].get_height() <= 0.5:
+                if not cluster[0].contains(white):
                     if closest_distance > cluster[0].distance(white):
                         closest_white = white
                         closest_distance = cluster[0].distance(white)
