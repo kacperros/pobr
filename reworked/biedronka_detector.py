@@ -35,6 +35,8 @@ class BiedronkaDetector:
         clusters = self.boxes_filter.filter()
         self.clusters_handler.add_clusters(clusters)
         cluster_groups = self.clusters_handler.handle_clusters()
+        for cluster_group in cluster_groups:
+            cluster_group.clean_cluster()
         return cluster_groups
 
     def __threshold_image(self):

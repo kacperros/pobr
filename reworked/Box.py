@@ -4,6 +4,7 @@ import numpy as np
 
 class Box:
     def __init__(self, box_color):
+        self.is_valid = True
         self.box_color = box_color
         self.row_min = sys.maxsize
         self.row_max = -1
@@ -62,3 +63,27 @@ class Box:
         return not (self.col_min < 0 or self.row_min < 0 or
                     self.col_max > 100000 or self.row_max > 100000 or
                     self.get_height() < 5 or self.get_width() < 5)
+
+    def combine(self, box):
+        combined = Box(self.box_color)
+        combined.col_max = np.maximum(self.col_max, box.col_max)
+        combined.col_min = np.minimum(self.col_min, box.col_min)
+        combined.row_max = np.maximum(self.row_max, box.row_max)
+        combined.row_min = np.minimum(self.row_min, box.row_min)
+        return combined
+
+    def set_col_max(self, ncol_max):
+        self.col_max = ncol_max
+        self.is_valid = False
+
+    def set_col_min(self, ncol_min):
+        self.col_min = ncol_min
+        self.is_valid = False
+
+    def set_row_max(self, nrow_max):
+        self.row_max = nrow_max
+        self.is_valid = False
+
+    def set_row_min(self, nrow_min):
+        self.row_min = nrow_min
+        self.is_valid = False
