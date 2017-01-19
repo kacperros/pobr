@@ -57,3 +57,8 @@ class Box:
             return box.col_min - self.col_max
         else:
             return 0
+
+    def is_clusterable(self):
+        return not (self.col_min < 0 or self.row_min < 0 or
+                    self.col_max > 100000 or self.row_max > 100000 or
+                    self.get_height() < 5 or self.get_width() < 5)

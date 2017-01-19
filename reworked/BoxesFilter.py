@@ -1,5 +1,7 @@
 from reworked.Box import Box
 import numpy as np
+
+from reworked.Cluster import Cluster
 from reworked.Colors import BColors
 import sys
 
@@ -15,7 +17,7 @@ class BoxesFilter:
 
     def filter(self):
         self.__filter_out_bad_boxes()
-        self.__remove_unpaired_black_reds()
+        self.__group_black_red()
         self.__remove_bad_whites()
         self.__cluster_in_whites()
         return self.clusters
@@ -24,18 +26,11 @@ class BoxesFilter:
         for k, v in self.boxes.items():
             items = []
             for box in v:
-                if box.col_min < 0 or box.row_min < 0:
-                    continue
-                if box.col_max > 100000 or box.row_max > 100000:
-                    continue
-                if box.get_height() < 5 or box.get_width() < 5:
+                if not box.is_clusterable():
                     continue
                 items.append(box)
             v = items
             self.boxes[k] = v
-
-    def __remove_unpaired_black_reds(self):
-        self.__group_black_red()
 
     def __group_black_red(self):
         for red in self.boxes[BColors.RED.value[0]]:
@@ -44,7 +39,7 @@ class BoxesFilter:
                 if red.contains(black):
                     blacks.append(black)
             if blacks:
-                self.clusters.append((red, blacks, []))
+                self.clusters.append(Cluster(red, blacks, None))
 
     def __remove_bad_whites(self):
         whites = self.boxes[BColors.WHITE.value[0]]
@@ -66,20 +61,12 @@ class BoxesFilter:
             closest_white = None
             closest_distance = sys.maxsize
             for white in self.boxes[BColors.WHITE.value[0]]:
-                if not cluster[0].contains(white):
-                    if closest_distance > cluster[0].distance(white):
+                if not cluster.red.contains(white):
+                    if closest_distance > cluster.red.distance(white):
                         closest_white = white
-                        closest_distance = cluster[0].distance(white)
+                        closest_distance = cluster.red.distance(white)
             if closest_white is not None:
-                cluster[2].append(closest_white)
-
-    def __get_remaining_boxes(self):
-        boxes = []
-        for cluster in self.clusters:
-            boxes.append(cluster[0])
-            boxes.extend(cluster[1])
-            boxes.extend(cluster[2])
-        return boxes
+                cluster.white = closest_white
 
     def clear(self):
         self.boxes = {BColors.RED.value[0]: [], BColors.BLACK.value[0]: [], BColors.WHITE.value[0]: []}

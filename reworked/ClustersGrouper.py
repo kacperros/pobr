@@ -1,7 +1,7 @@
-import numpy as np
+from reworked.ClusterGroup import ClusterGroup
 
 
-class ClustersHandler:
+class ClustersGrouper:
     def __init__(self):
         self.clusters = []
         self.cluster_groups = []
@@ -20,17 +20,15 @@ class ClustersHandler:
     def __filter_out_bad_clusters(self):
         clusters = []
         for cluster in self.clusters:
-            red = cluster[0]
-            white = cluster[2][0]
-            if red.distance(white) > np.sqrt((white.get_height()/3) ** 2 + (white.get_width()/3) ** 2):
-                continue
-            if red.get_width() * red.get_height() * 1.2 < white.get_width() * white.get_height():
-                continue
-            if len(cluster[1]) > 5:
-                continue
-            clusters.append(cluster)
+            if cluster.is_biedronka_cluster():
+                clusters.append(cluster)
         self.clusters = clusters
 
     def __group_clusters(self):
-        self.cluster_groups = self.clusters
-
+        cluster_groups = {}
+        for cluster in self.clusters:
+            if cluster_groups.get(id(cluster.white)) is None:
+                cluster_groups[id(cluster.white)] = ClusterGroup(cluster)
+            else:
+                cluster_groups[id(cluster.white)].add_cluster(cluster)
+        self.cluster_groups = cluster_groups.values()
