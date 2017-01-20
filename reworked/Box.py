@@ -73,17 +73,17 @@ class Box:
         return combined
 
     def set_col_max(self, ncol_max):
-        self.col_max = ncol_max
+        self.col_max = int(ncol_max)
         self.is_valid = False
 
     def set_col_min(self, ncol_min):
-        self.col_min = ncol_min
+        self.col_min = int(ncol_min)
         self.is_valid = False
 
     def set_row_max(self, nrow_max):
-        self.row_max = nrow_max
+        self.row_max = int(nrow_max)
         self.is_valid = False
 
     def set_row_min(self, nrow_min):
-        self.row_min = nrow_min
+        self.row_min = int(nrow_min)
         self.is_valid = False

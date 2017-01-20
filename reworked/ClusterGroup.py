@@ -31,4 +31,13 @@ class ClusterGroup:
                 continue
             if red.get_width() / 2 > white.get_width() \
                     and white.col_max >= red.col_max >= white.col_min > red.col_min:
-                red.set_col_min(int(white.col_min - white.get_width()))
+                red.set_col_min(white.col_min - white.get_width())
+        if len(reds) == 1 and reds[0].col_max <= white.col_max:
+            reds[0].col_min -= int(white.get_width() / 1.8)
+
+    def box_cluster(self):
+        boxes = self.get_boxes()
+        bounding = self.initial_cluster.white
+        for box in boxes:
+            bounding = bounding.combine(box)
+        return bounding
