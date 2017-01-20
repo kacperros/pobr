@@ -1,9 +1,7 @@
-from reworked.Box import Box
-import numpy as np
+import sys
 
 from reworked.Cluster import Cluster
 from reworked.Colors import BColors
-import sys
 
 
 class BoxesFilter:

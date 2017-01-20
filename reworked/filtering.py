@@ -24,6 +24,15 @@ def filter_median(image):
     return img
 
 
+def filter_ranking(image, rank):
+    img = copy.copy(image)
+    rows, cols, channels = image.shape
+    for i in range(1, rows - 1):
+        for j in range(1, cols - 1):
+            img[i, j] = ranking(image[i - 1:i + 2, j - 1:j + 2].astype(int), rank)
+    return img
+
+
 def median(pixels):
     pixels_list = []
     for i in range(0, 3):
@@ -31,6 +40,15 @@ def median(pixels):
             pixels_list.append([i, j, (int(pixels[i, j, 0]) + int(pixels[i, j, 1]) + int(pixels[i, j, 2])) / 3])
     pixels_list.sort(key=lambda x: x[2])
     return pixels[pixels_list[5][0], pixels_list[5][1]]
+
+
+def ranking(pixels, rank):
+    pixels_list = []
+    for i in range(0, 3):
+        for j in range(0, 3):
+            pixels_list.append([i, j, (int(pixels[i, j, 0]) + int(pixels[i, j, 1]) + int(pixels[i, j, 2])) / 3])
+    pixels_list.sort(key=lambda x: x[2])
+    return pixels[pixels_list[rank][0], pixels_list[rank][1]]
 
 
 def convolve(filtr, pixels):

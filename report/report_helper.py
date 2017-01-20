@@ -1,6 +1,6 @@
 import cv2
-import Box
-import colorspace_converters as cs_conv
+import reworked.Box
+import reworked.colorspace_converters as cs_conv
 from reworked.BoxesFilter import BoxesFilter
 from reworked.ClustersGrouper import ClustersGrouper
 import reworked.box_drawer as bdraw
@@ -105,21 +105,48 @@ def group_clusters(clusters_grouped, resized_img, image_number):
     for group in groups:
         image = bdraw.draw_boxes(copy.copy(resized_img), group.get_boxes())
         cv2.imwrite('7_cluster_grouped/' + str(image_number) + 'cluster' + str(k) + '.jpg', image)
+        k += 1
     return groups
 
 
-def finalize_clusters(groups, resized_img, image_number):
+def finalize_clusters(groups, resized_img, image_number, number_tried):
     cluster_boxs = []
     print('Started finalizing')
     for group in groups:
-        group.clean_cluster()
+        if not group.is_biedronka():
+            group.clean_cluster()
+            if not group.is_biedronka():
+                number_tried += 1
+                rework_apply_erosion(image_number, resized_img, number_tried)
         cluster_boxs.append(group.box_cluster())
     print('Done Finalizing')
     image = bdraw.draw_boxes(copy.copy(resized_img), cluster_boxs)
     cv2.imwrite('8_clustered_final/' + str(image_number) + '.jpg', image)
 
+
+def rework_apply_erosion(image_number, image_scaled, number_tried):
+    if number_tried > 3:
+        return
+    img_thresholded = threshold_image(image_number)
+    reds = [cs_conv.hsv2bgr(img_thresholded[0]), cs_conv.hsv2bgr(img_thresholded[1])]
+    for j in range(0, 6):
+        for t in range(0, 2):
+            reds[t] = filtr.filter_ranking(reds[t], 0)
+    cv2.imwrite('3_thresholded/' + str(image_number) + '_red_bottom.jpg', reds[0])
+    print('Red bottom thresh done')
+    cv2.imwrite('3_thresholded/' + str(image_number) + '_red_bottom.jpg', reds[1])
+    print('Red bottom thresh done')
+    img_thresholded[0] = cs_conv.bgr2hsv(reds[0])
+    img_thresholded[1] = cs_conv.bgr2hsv(reds[1])
+    boxesr = get_bounding_boxes(img_thresholded, image_scaled, i)
+    boxes_filteredr = filter_boxes(boxesr, image_scaled, i)
+    clustersr = cluster_boxes(boxes_filteredr, image_scaled, i)
+    cluster_groupsr = group_clusters(clustersr, image_scaled, i)
+    finalize_clusters(cluster_groupsr, image_scaled, i, number_tried)
+
+
 scale = False
-mfiltr = False
+mfiltr = True
 for i in range(1, 12):
     print('Right away, Sir')
     if scale:
@@ -132,5 +159,5 @@ for i in range(1, 12):
     boxes_filtered = filter_boxes(boxes, resized, i)
     clusters = cluster_boxes(boxes_filtered, resized, i)
     cluster_groups = group_clusters(clusters, resized, i)
-    finalize_clusters(cluster_groups, resized, i)
+    finalize_clusters(cluster_groups, resized, i, 0)
     print('Done Sir')

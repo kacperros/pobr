@@ -1,13 +1,11 @@
-import Box
-import colorspace_converters as cs_conv
+import copy
+
+import reworked.colorspace_converters as cs_conv
+from reworked.BoundingBoxesBuilder import BoundingBoxesBuilder
 from reworked.BoxesFilter import BoxesFilter
 from reworked.ClustersGrouper import ClustersGrouper
-from reworked.threshold import HSVThresholder, PixelHThreshold, PixelVThreshold, PixelSThreshold
 from reworked.Colors import BColors
-from reworked.BoundingBoxesBuilder import BoundingBoxesBuilder
-import cv2
-import copy
-import numpy as np
+from reworked.threshold import HSVThresholder, PixelHThreshold, PixelVThreshold, PixelSThreshold
 
 
 class BiedronkaDetector:

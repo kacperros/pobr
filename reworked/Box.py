@@ -38,6 +38,9 @@ class Box:
     def get_height(self):
         return self.row_max - self.row_min
 
+    def get_box_area(self):
+        return self.get_width() * self.get_height()
+
     def distance(self, box):
         vertical_dist = self.__get_vertical_dist(box)
         horizontal_dist = self.__get_horizonta_dist(box)
