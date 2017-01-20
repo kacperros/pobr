@@ -15,7 +15,20 @@ class BoxesFilter:
         for box in boxes_to_filter:
             self.boxes[box.box_color].append(box)
 
-    def filter(self):
+    def filter_boxes(self):
+        self.__filter_out_bad_boxes()
+        self.__remove_bad_whites()
+        boxes = []
+        for k, v in self.boxes.items():
+            boxes.extend(v)
+        return boxes
+
+    def cluster_boxes(self):
+        self.__group_black_red()
+        self.__cluster_in_whites()
+        return self.clusters
+
+    def filter_cluster(self):
         self.__filter_out_bad_boxes()
         self.__group_black_red()
         self.__remove_bad_whites()
